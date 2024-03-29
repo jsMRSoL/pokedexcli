@@ -1,13 +1,14 @@
 package main
 
 import (
-  "fmt"
-  "bufio"
-  "os"
+	"bufio"
+	"fmt"
+	"os"
 )
 
 func startRepl() {
 	cmds := getCommands()
+  config := newConfig()
 	for {
 		fmt.Printf("pokedex > ")
 		scanner := bufio.NewScanner(os.Stdin)
@@ -15,10 +16,10 @@ func startRepl() {
 		input := scanner.Text()
 		if _, ok := cmds[input]; !ok {
 			fmt.Println("Command not recognised. Try help!")
-      fmt.Println()
+			fmt.Println()
 		} else {
-			cmds[input].callback()
-      fmt.Println()
+			cmds[input].callback(config)
+			fmt.Println()
 		}
 	}
 }
@@ -26,12 +27,34 @@ func startRepl() {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
+}
+
+type config struct {
+	urls  []string
+	index int
+}
+
+func newConfig() *config {
+	return &config{
+		urls:  []string{},
+		index: -1,
+	}
 }
 
 func getCommands() map[string]cliCommand {
 
 	return map[string]cliCommand{
+		"map": {
+			name:        "map",
+			description: "Display the next 20 locations in the Pokemon world",
+			callback:    mapForward,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Display the previous 20 locations in the Pokemon world",
+			callback:    mapBackward,
+		},
 		"help": {
 			name:        "help",
 			description: "Displays a help message",
@@ -44,4 +67,3 @@ func getCommands() map[string]cliCommand {
 		},
 	}
 }
-
