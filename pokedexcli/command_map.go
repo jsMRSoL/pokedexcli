@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/jsMRSoL/pokedexcli/internal/api"
+
+	"github.com/jsMRSoL/pokedexcli/internal/locations"
 )
 
 func mapForward(c *config) error {
