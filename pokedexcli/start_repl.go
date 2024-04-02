@@ -8,7 +8,7 @@ import (
 
 func startRepl() {
 	cmds := getCommands()
-  config := newConfig()
+	config := newConfig()
 	for {
 		fmt.Printf("pokedex > ")
 		scanner := bufio.NewScanner(os.Stdin)
@@ -31,14 +31,16 @@ type cliCommand struct {
 }
 
 type config struct {
-	urls  []string
-	index int
+	prev *string
+	next *string
 }
 
 func newConfig() *config {
+	// first := "https://pokeapi.co/api/v2/location-area/"
+	first := "notaurl.noreally"
 	return &config{
-		urls:  []string{},
-		index: -1,
+		prev: nil,
+		next: &first,
 	}
 }
 

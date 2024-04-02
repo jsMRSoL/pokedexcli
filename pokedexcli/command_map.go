@@ -6,24 +6,13 @@ import (
 )
 
 func mapForward(c *config) error {
-	var url string
-	if c.index == -1 {
-		url = "https://pokeapi.co/api/v2/location-area/"
-		urls := c.urls
-		urls = append(urls, url)
-		c.urls = urls
-		c.index = 0
-	} else {
-		c.index++
-		url = c.urls[c.index]
-	}
-
-	ld, err := api.GetLocationsData(url)
+	ld, err := api.GetLocationsData(c.next)
 	if err != nil {
 		return err
 	}
 
-	c.urls = append(c.urls, ld.Next)
+	c.next = ld.Next
+	c.prev = ld.Previous
 
 	for _, v := range ld.Results {
 		fmt.Println(v.Name)
@@ -33,23 +22,18 @@ func mapForward(c *config) error {
 }
 
 func mapBackward(c *config) error {
-	var url string
-	if c.index == -1 {
-		mapForward(c)
-		return nil
-	}
-	if c.index == 0 {
+	if c.prev == nil {
 		fmt.Println("Already at the start!")
 		return nil
 	}
 
-	c.index--
-	url = c.urls[c.index]
-
-	ld, err := api.GetLocationsData(url)
+	ld, err := api.GetLocationsData(c.prev)
 	if err != nil {
 		return err
 	}
+
+	c.next = ld.Next
+	c.prev = ld.Previous
 
 	for _, v := range ld.Results {
 		fmt.Println(v.Name)
