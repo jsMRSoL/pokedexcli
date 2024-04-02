@@ -8,7 +8,7 @@ import (
 	"github.com/jsMRSoL/pokedexcli/internal/locations"
 )
 
-func mapForward(c *config) error {
+func mapForward(c *config, args []string) error {
 	data, found := c.cache.Get(*c.next)
 	var ld locations.LocationsData
 	if found {
@@ -16,7 +16,7 @@ func mapForward(c *config) error {
 			log.Println("Error decoding cached JSON: ", err)
 			return err
 		}
-    log.Println("Returning data from cache...")
+    // log.Println("Returning data from cache...")
 	} else {
 		var err error
     var bytes []byte
@@ -24,8 +24,8 @@ func mapForward(c *config) error {
 		if err != nil {
 			return err
 		}
-    log.Println("Returning data from api...")
-    log.Println("Caching url: ", *c.next)
+    // log.Println("Returning data from api...")
+    // log.Println("Caching url: ", *c.next)
     c.cache.Add(*c.next, bytes)
 	}
 
@@ -39,7 +39,7 @@ func mapForward(c *config) error {
 	return nil
 }
 
-func mapBackward(c *config) error {
+func mapBackward(c *config, _ []string) error {
 	if c.prev == nil {
 		fmt.Println("Already at the start!")
 		return nil
@@ -52,7 +52,7 @@ func mapBackward(c *config) error {
 			log.Println("Error decoding JSON: ", err)
 			return err
 		}
-    log.Println("Returning data from cache...")
+    // log.Println("Returning data from cache...")
 	} else {
     var err error
     var bytes []byte
@@ -60,9 +60,9 @@ func mapBackward(c *config) error {
 		if err != nil {
 			return err
 		}
-    log.Println("Returning data from api...")
+    // log.Println("Returning data from api...")
     // This is safe because we checked if c.prev == nil above
-    log.Println("Caching url: ", *c.prev)
+    // log.Println("Caching url: ", *c.prev)
     c.cache.Add(*c.prev, bytes)
 	}
 

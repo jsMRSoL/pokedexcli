@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/jsMRSoL/pokedexcli/internal/pokecache"
@@ -17,36 +18,57 @@ func startRepl() {
 		scanner := bufio.NewScanner(os.Stdin)
 		scanner.Scan()
 		input := scanner.Text()
-		if _, ok := cmds[input]; !ok {
-			fmt.Println("Command not recognised. Try help!")
-			fmt.Println()
-		} else {
-			cmds[input].callback(config)
-			fmt.Println()
+		cmd, args, err := normalizeInput(input)
+
+		if err == nil {
+			if _, ok := cmds[cmd]; !ok {
+				fmt.Println("Command not recognised. Try help!")
+				fmt.Println()
+			} else {
+				cmds[cmd].callback(config, args)
+				fmt.Println()
+			}
 		}
 	}
+}
+
+func normalizeInput(input string) (cmd string, args []string, err error) {
+	wds := strings.Fields(input)
+	if len(wds) == 0 {
+		fmt.Println("You have to enter a command. Try help!")
+		fmt.Println()
+		return "", args, err
+	}
+
+	cmd = wds[0]
+
+	if len(wds) > 1 {
+		args = wds[1:]
+	}
+
+	return cmd, args, nil
 }
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, []string) error
 }
 
 type config struct {
-	prev *string
-	next *string
-  cache *pokecache.PokeCache
+	prev  *string
+	next  *string
+	cache *pokecache.PokeCache
 }
 
 func newConfig() *config {
 	first := "https://pokeapi.co/api/v2/location-area/"
 	// first := "notaurl.noreally"
-  pc := pokecache.NewCache(time.Minute * 5)
+	pc := pokecache.NewCache(time.Minute * 5)
 	return &config{
-		prev: nil,
-		next: &first,
-    cache: pc,
+		prev:  nil,
+		next:  &first,
+		cache: pc,
 	}
 }
 
@@ -62,6 +84,11 @@ func getCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Display the previous 20 locations in the Pokemon world",
 			callback:    mapBackward,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Explore an area <name>, looking for Pokemon",
+			callback:    exploreArea,
 		},
 		"help": {
 			name:        "help",
