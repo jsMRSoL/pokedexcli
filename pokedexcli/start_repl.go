@@ -4,6 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"time"
+
+	"github.com/jsMRSoL/pokedexcli/internal/pokecache"
 )
 
 func startRepl() {
@@ -33,14 +36,17 @@ type cliCommand struct {
 type config struct {
 	prev *string
 	next *string
+  cache *pokecache.PokeCache
 }
 
 func newConfig() *config {
-	// first := "https://pokeapi.co/api/v2/location-area/"
-	first := "notaurl.noreally"
+	first := "https://pokeapi.co/api/v2/location-area/"
+	// first := "notaurl.noreally"
+  pc := pokecache.NewCache(time.Minute * 5)
 	return &config{
 		prev: nil,
 		next: &first,
+    cache: pc,
 	}
 }
 

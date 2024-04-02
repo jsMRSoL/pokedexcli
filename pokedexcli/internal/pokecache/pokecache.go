@@ -10,13 +10,13 @@ type cacheEntry struct {
 	val       []byte
 }
 
-type pokeCache struct {
+type PokeCache struct {
 	cache map[string]cacheEntry
 	mu    sync.Mutex
 }
 
-func NewCache(duration time.Duration) *pokeCache {
-	pc := pokeCache{
+func NewCache(duration time.Duration) *PokeCache {
+	pc := PokeCache{
 		cache: make(map[string]cacheEntry),
 	}
 
@@ -24,7 +24,7 @@ func NewCache(duration time.Duration) *pokeCache {
 	return &pc
 }
 
-func (pc *pokeCache) Add(key string, val []byte) {
+func (pc *PokeCache) Add(key string, val []byte) {
 	pc.mu.Lock()
 	defer pc.mu.Unlock()
 	pc.cache[key] = cacheEntry{
@@ -33,7 +33,7 @@ func (pc *pokeCache) Add(key string, val []byte) {
 	}
 }
 
-func (pc *pokeCache) Get(key string) ([]byte, bool) {
+func (pc *PokeCache) Get(key string) ([]byte, bool) {
 	pc.mu.Lock()
 	defer pc.mu.Unlock()
 
@@ -45,7 +45,7 @@ func (pc *pokeCache) Get(key string) ([]byte, bool) {
 	return entry.val, found
 }
 
-func (pc *pokeCache) reapLoop(duration time.Duration) {
+func (pc *PokeCache) reapLoop(duration time.Duration) {
 	// ticker := time.NewTicker(time.Minute * 5)
 	ticker := time.NewTicker(duration)
 	defer ticker.Stop()
