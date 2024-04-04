@@ -7,7 +7,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/jsMRSoL/pokedexcli/internal/pokemon"
+	"github.com/jsMRSoL/pokedexcli/internal/encounters"
 )
 
 func getUrlString(args []string) (string, error) {
@@ -37,7 +37,7 @@ func exploreArea(c *config, args []string) error {
 	}
 
 	data, found := c.cache.Get(url)
-	var pe pokemon.PokemonEncounters
+	var pe encounters.PokemonEncounters
 	if found {
 		if err := json.Unmarshal(data, &pe); err != nil {
 			log.Println("Error decoding cached JSON: ", err)
@@ -47,7 +47,7 @@ func exploreArea(c *config, args []string) error {
 	} else {
 		var err error
 		var bytes []byte
-		pe, bytes, err = pokemon.GetPokemonList(url)
+		pe, bytes, err = encounters.GetPokemonList(url)
 		if err != nil {
 			return err
 		}
