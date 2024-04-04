@@ -1,6 +1,7 @@
 package pokemon
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -33,4 +34,22 @@ func (pc *Pokedex) Get(key string) (PokemonData, bool) {
 	}
 
 	return entry, found
+}
+
+func (pc *Pokedex) List() {
+	pc.mu.Lock()
+	defer pc.mu.Unlock()
+
+	fmt.Println("Your Pokedex:")
+	for key := range pc.cache {
+		fmt.Printf(" - %s\n", key)
+	}
+}
+
+func (pc *Pokedex) Len() int {
+	pc.mu.Lock()
+	defer pc.mu.Unlock()
+
+	return len(pc.cache)
+
 }
