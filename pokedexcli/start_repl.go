@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/jsMRSoL/pokedexcli/internal/pokecache"
+	"github.com/jsMRSoL/pokedexcli/internal/pokemon"
 )
 
 func startRepl() {
@@ -25,7 +26,10 @@ func startRepl() {
 				fmt.Println("Command not recognised. Try help!")
 				fmt.Println()
 			} else {
-				cmds[cmd].callback(config, args)
+				err := cmds[cmd].callback(config, args)
+				if err != nil {
+					fmt.Printf("Error: %s\n", err)
+				}
 				fmt.Println()
 			}
 		}
@@ -56,19 +60,23 @@ type cliCommand struct {
 }
 
 type config struct {
-	prev  *string
-	next  *string
-	cache *pokecache.PokeCache
+	prev    *string
+	next    *string
+	cache   *pokecache.PokeCache
+	pokedex *pokemon.Pokedex
 }
 
 func newConfig() *config {
 	first := "https://pokeapi.co/api/v2/location-area/"
 	// first := "notaurl.noreally"
 	pc := pokecache.NewCache(time.Minute * 5)
+	px := pokemon.NewPokedex()
+
 	return &config{
-		prev:  nil,
-		next:  &first,
-		cache: pc,
+		prev:    nil,
+		next:    &first,
+		cache:   pc,
+		pokedex: px,
 	}
 }
 
@@ -89,6 +97,11 @@ func getCommands() map[string]cliCommand {
 			name:        "explore",
 			description: "Explore an area <name>, looking for Pokemon",
 			callback:    exploreArea,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Catch a Pokemon <name>",
+			callback:    catchPokemon,
 		},
 		"help": {
 			name:        "help",
